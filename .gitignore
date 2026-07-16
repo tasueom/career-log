@@ -2,24 +2,54 @@
 .DS_Store
 Thumbs.db
 
-# IDE
-.idea/
-.vscode/
-
-# Backend
-backend/build/
-backend/.gradle/
-backend/out/
-backend/.env
-
-# Frontend
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-frontend/.vite/
-
 # Logs
 *.log
 
 # Environment
 .env
+*.env
+backend/.env
+frontend/.env
+backend/src/main/resources/application-local.yml
+backend/src/main/resources/application-secret.yml
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+backend/out/
+
+# VS Code
+.vscode/
+
+# Eclipse / STS
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+bin/
+
+# Gradle
+.gradle/
+backend/.gradle/
+build/
+backend/build/
+!gradle/wrapper/gradle-wrapper.jar
+!backend/gradle/wrapper/gradle-wrapper.jar
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
