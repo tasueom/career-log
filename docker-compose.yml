@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: career-log-postgres
+    environment:
+      POSTGRES_DB: career_log
+      POSTGRES_USER: career
+      POSTGRES_PASSWORD: career1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - career_log_data:/var/lib/postgresql/data
+
+volumes:
+  career_log_data:
