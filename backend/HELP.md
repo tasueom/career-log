@@ -1,8 +1,3 @@
-# Read Me First
-The following was discovered as part of building this project:
-
-* The original package name 'CareerLog Backend' is invalid and this project uses 'CareerLog.Backend' instead.
-
 # Getting Started
 
 ### Reference Documentation

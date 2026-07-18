@@ -1,4 +1,4 @@
-package CareerLog.Backend;
+package com.careerlog;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
