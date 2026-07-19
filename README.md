@@ -30,6 +30,14 @@
 - Temporal 기반 면접 준비 워크플로
 - Oracle Cloud 배포
 
+## 프로젝트 문서
+
+프로젝트 설계와 데이터 구조는 아래 문서를 참고하실 수 있습니다.
+
+- [요구사항 정의서](docs/requirements.md)
+- [테이블 정의서](docs/table-definition.md)
+- [ERD](docs/erd.md)
+
 ## 개발 현황
 
 | 분류 | 기능 및 작업 내용 | 상태 |
