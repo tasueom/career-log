@@ -3,9 +3,9 @@ spring:
     name: career-log
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/career_log
-    username: career
-    password: career1234
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/career_log}
+    username: ${SPRING_DATASOURCE_USERNAME:career}
+    password: ${SPRING_DATASOURCE_PASSWORD:career1234}
     driver-class-name: org.postgresql.Driver
 
   jpa:
