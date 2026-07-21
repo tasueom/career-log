@@ -19,6 +19,8 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
 
+    private static final String NOT_FOUND_APPLICATION_MESSAGE = "지원 건을 찾을 수 없습니다.";
+
     @Transactional
     public ApplicationResponse create(ApplicationCreateRequest request) {
         Application application = new Application(
@@ -48,7 +50,7 @@ public class ApplicationService {
 
     public ApplicationResponse findById(Long applicationId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
 
         return ApplicationResponse.from(application);
     }
@@ -56,7 +58,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponse update(Long applicationId, ApplicationUpdateRequest request) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
 
         application.update(
                 request.companyName(),
@@ -77,7 +79,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponse updateStatus(Long applicationId, ApplicationStatusUpdateRequest request){
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
 
         application.updateStatus(request.status());
 
@@ -87,7 +89,7 @@ public class ApplicationService {
     @Transactional
     public void delete(Long applicationId){
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(()-> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(()-> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
 
         applicationRepository.delete(application);
     }
