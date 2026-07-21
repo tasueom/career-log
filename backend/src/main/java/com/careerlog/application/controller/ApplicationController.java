@@ -2,6 +2,7 @@ package com.careerlog.application.controller;
 
 import com.careerlog.application.dto.ApplicationCreateRequest;
 import com.careerlog.application.dto.ApplicationResponse;
+import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.service.ApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,13 @@ public class ApplicationController {
     @GetMapping("/{applicationId}")
     public ApplicationResponse findById(@PathVariable Long applicationId) {
         return applicationService.findById(applicationId);
+    }
+
+    @PutMapping("/{applicationId}")
+    public ApplicationResponse update(
+            @PathVariable Long applicationId,
+            @Valid @RequestBody ApplicationUpdateRequest request
+    ) {
+        return applicationService.update(applicationId, request);
     }
 }

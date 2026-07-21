@@ -2,6 +2,7 @@ package com.careerlog.application.service;
 
 import com.careerlog.application.dto.ApplicationCreateRequest;
 import com.careerlog.application.dto.ApplicationResponse;
+import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.entity.Application;
 import com.careerlog.application.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,27 @@ public class ApplicationService {
     public ApplicationResponse findById(Long applicationId) {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+
+        return ApplicationResponse.from(application);
+    }
+
+    @Transactional
+    public ApplicationResponse update(Long applicationId, ApplicationUpdateRequest request) {
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+
+        application.update(
+                request.companyName(),
+                request.positionTitle(),
+                request.jobUrl(),
+                request.status(),
+                request.priority(),
+                request.appliedAt(),
+                request.resultExpectedAt(),
+                request.nextAction(),
+                request.nextActionAt(),
+                request.memo()
+        );
 
         return ApplicationResponse.from(application);
     }

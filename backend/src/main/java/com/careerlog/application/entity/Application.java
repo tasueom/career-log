@@ -73,4 +73,28 @@ public class Application extends BaseTimeEntity {
         this.nextActionAt = nextActionAt;
         this.memo = memo;
     }
+
+    public void update(
+            String companyName,
+            String positionTitle,
+            String jobUrl,
+            ApplicationStatus status,
+            Priority priority,
+            LocalDate appliedAt,
+            LocalDate resultExpectedAt,
+            String nextAction,
+            LocalDateTime nextActionAt,
+            String memo
+    ) {
+        this.companyName = companyName;
+        this.positionTitle = positionTitle;
+        this.jobUrl = jobUrl;
+        this.status = status;
+        this.priority = priority;
+        this.appliedAt = appliedAt;
+        this.resultExpectedAt = resultExpectedAt;
+        this.nextAction = nextAction;
+        this.nextActionAt = nextActionAt;
+        this.memo = memo;
+    }
 }
