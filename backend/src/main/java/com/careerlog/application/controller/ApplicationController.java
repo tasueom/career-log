@@ -2,6 +2,7 @@ package com.careerlog.application.controller;
 
 import com.careerlog.application.dto.ApplicationCreateRequest;
 import com.careerlog.application.dto.ApplicationResponse;
+import com.careerlog.application.dto.ApplicationStatusUpdateRequest;
 import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.service.ApplicationService;
 import jakarta.validation.Valid;
@@ -40,6 +41,14 @@ public class ApplicationController {
             @Valid @RequestBody ApplicationUpdateRequest request
     ) {
         return applicationService.update(applicationId, request);
+    }
+
+    @PatchMapping("/{applicationId}/status")
+    public ApplicationResponse updateStatus(
+            @PathVariable Long applicationId,
+            @Valid @RequestBody ApplicationStatusUpdateRequest request
+    ) {
+        return applicationService.updateStatus(applicationId, request);
     }
 
     @DeleteMapping("/{applicationId}")

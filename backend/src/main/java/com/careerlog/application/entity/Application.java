@@ -97,4 +97,8 @@ public class Application extends BaseTimeEntity {
         this.nextActionAt = nextActionAt;
         this.memo = memo;
     }
+
+    public void updateStatus(ApplicationStatus status){
+        this.status = status;
+    }
 }

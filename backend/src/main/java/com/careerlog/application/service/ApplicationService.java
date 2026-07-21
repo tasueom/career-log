@@ -2,6 +2,7 @@ package com.careerlog.application.service;
 
 import com.careerlog.application.dto.ApplicationCreateRequest;
 import com.careerlog.application.dto.ApplicationResponse;
+import com.careerlog.application.dto.ApplicationStatusUpdateRequest;
 import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.entity.Application;
 import com.careerlog.application.repository.ApplicationRepository;
@@ -69,6 +70,16 @@ public class ApplicationService {
                 request.nextActionAt(),
                 request.memo()
         );
+
+        return ApplicationResponse.from(application);
+    }
+
+    @Transactional
+    public ApplicationResponse updateStatus(Long applicationId, ApplicationStatusUpdateRequest request){
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+
+        application.updateStatus(request.status());
 
         return ApplicationResponse.from(application);
     }
