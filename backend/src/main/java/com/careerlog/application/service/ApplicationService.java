@@ -72,4 +72,12 @@ public class ApplicationService {
 
         return ApplicationResponse.from(application);
     }
+
+    @Transactional
+    public void delete(Long applicationId){
+        Application application = applicationRepository.findById(applicationId)
+                .orElseThrow(()-> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+
+        applicationRepository.delete(application);
+    }
 }

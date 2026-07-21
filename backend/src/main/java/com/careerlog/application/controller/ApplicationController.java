@@ -41,4 +41,10 @@ public class ApplicationController {
     ) {
         return applicationService.update(applicationId, request);
     }
+
+    @DeleteMapping("/{applicationId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long applicationId){
+        applicationService.delete(applicationId);
+    }
 }
