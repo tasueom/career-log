@@ -5,6 +5,7 @@ import com.careerlog.application.dto.ApplicationResponse;
 import com.careerlog.application.dto.ApplicationStatusUpdateRequest;
 import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.entity.Application;
+import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.application.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,6 @@ import java.util.List;
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
-
-    private static final String NOT_FOUND_APPLICATION_MESSAGE = "지원 건을 찾을 수 없습니다.";
 
     @Transactional
     public ApplicationResponse create(ApplicationCreateRequest request) {
@@ -50,7 +49,7 @@ public class ApplicationService {
 
     public ApplicationResponse findById(Long applicationId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         return ApplicationResponse.from(application);
     }
@@ -58,7 +57,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponse update(Long applicationId, ApplicationUpdateRequest request) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         application.update(
                 request.companyName(),
@@ -79,7 +78,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponse updateStatus(Long applicationId, ApplicationStatusUpdateRequest request){
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         application.updateStatus(request.status());
 
@@ -89,7 +88,7 @@ public class ApplicationService {
     @Transactional
     public void delete(Long applicationId){
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(()-> new IllegalArgumentException(NOT_FOUND_APPLICATION_MESSAGE));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         applicationRepository.delete(application);
     }
