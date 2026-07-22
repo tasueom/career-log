@@ -5,6 +5,7 @@ import com.careerlog.application.dto.ApplicationResponse;
 import com.careerlog.application.dto.ApplicationStatusUpdateRequest;
 import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.entity.Application;
+import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.application.repository.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class ApplicationService {
 
     public ApplicationResponse findById(Long applicationId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         return ApplicationResponse.from(application);
     }
@@ -56,7 +57,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponse update(Long applicationId, ApplicationUpdateRequest request) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         application.update(
                 request.companyName(),
@@ -77,7 +78,7 @@ public class ApplicationService {
     @Transactional
     public ApplicationResponse updateStatus(Long applicationId, ApplicationStatusUpdateRequest request){
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         application.updateStatus(request.status());
 
@@ -87,7 +88,7 @@ public class ApplicationService {
     @Transactional
     public void delete(Long applicationId){
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(()-> new IllegalArgumentException("지원 건을 찾을 수 없습니다."));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         applicationRepository.delete(application);
     }
