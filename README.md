@@ -19,6 +19,7 @@
 - Spring Data JPA
 - PostgreSQL
 - JWT
+- Swagger/OpenAPI
 
 ### Frontend
 - Vite
@@ -37,6 +38,16 @@
 - [요구사항 정의서](docs/requirements.md)
 - [테이블 정의서](docs/table-definition.md)
 - [ERD](docs/erd.md)
+
+## API 문서
+
+본 프로젝트는 Swagger/OpenAPI를 활용해 백엔드 API 명세를 확인할 수 있도록 구성했습니다.
+
+현재는 로컬 개발 환경 기준으로 문서 경로를 제공합니다.  
+추후 배포 환경 구성 후에는 배포 도메인 기준의 Swagger 문서 URL로 갱신할 예정입니다.
+
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- OpenAPI Docs: http://localhost:8080/v3/api-docs
 
 ## 개발 현황
 
