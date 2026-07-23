@@ -19,6 +19,7 @@
 - Spring Data JPA
 - PostgreSQL
 - JWT
+- Swagger/OpenAPI
 
 ### Frontend
 - Vite
@@ -38,6 +39,16 @@
 - [테이블 정의서](docs/table-definition.md)
 - [ERD](docs/erd.md)
 
+## API 문서
+
+본 프로젝트는 Swagger/OpenAPI를 활용해 백엔드 API 명세를 확인할 수 있도록 구성했습니다. 현재는 지원 건 API 문서화를 완료했으며, 이후 구현되는 API를 순차적으로 추가할 예정입니다.
+
+현재는 로컬 개발 환경 기준으로 문서 경로를 제공합니다.  
+추후 배포 환경 구성 후에는 배포 도메인 기준의 Swagger 문서 URL로 갱신할 예정입니다.
+
+- Swagger UI: http://localhost:8080/swagger-ui.html
+- OpenAPI Docs: http://localhost:8080/v3/api-docs
+
 ## 개발 현황
 
 | 분류 | 기능 및 작업 내용 | 상태 |
@@ -47,6 +58,7 @@
 | **회원** | User 엔티티 및 JPA Auditing 구성 | ✅ 완료 |
 | **지원 관리** | 지원 건 등록 / 목록 조회 / 상세 조회 | ✅ 완료 |
 | **지원 관리** | 지원 건 수정 / 삭제 / 상태 변경 | ✅ 완료 |
+| **공통** | 전역 예외 처리 (지원 건 미존재 / 요청 검증 오류) | 🟡 일부 구현 |
 | **인증** | 회원가입 및 로그인 / JWT 인증/인가 | ⬜ 대기 |
 | **면접** | 면접 기록 관리 / 면접 질문 회고 관리 | ⬜ 대기 |
 | **프론트** | 프론트엔드 연동 | ⬜ 대기 |
