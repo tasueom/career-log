@@ -1,6 +1,7 @@
 package com.careerlog.global.exception;
 
 import com.careerlog.application.exception.ApplicationNotFoundException;
+import com.careerlog.auth.exception.DuplicateEmailException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,6 +34,15 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 "INVALID_REQUEST",
                 message
+        );
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDuplicateEmailException(DuplicateEmailException e) {
+        return new ErrorResponse(
+                "DUPLICATE_EMAIL",
+                e.getMessage()
         );
     }
 }
