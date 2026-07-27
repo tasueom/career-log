@@ -1,8 +1,11 @@
 package com.careerlog.auth.service;
 
+import com.careerlog.auth.dto.LoginRequest;
+import com.careerlog.auth.dto.LoginResponse;
 import com.careerlog.auth.dto.SignupRequest;
 import com.careerlog.auth.dto.SignupResponse;
 import com.careerlog.auth.exception.DuplicateEmailException;
+import com.careerlog.auth.exception.InvalidLoginException;
 import com.careerlog.user.entity.User;
 import com.careerlog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +36,16 @@ public class AuthService {
         User savedUser = userRepository.save(user);
 
         return SignupResponse.from(savedUser);
+    }
+
+    public LoginResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(InvalidLoginException::new);
+
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new InvalidLoginException();
+        }
+
+        return LoginResponse.from(user);
     }
 }

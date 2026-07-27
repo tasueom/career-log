@@ -2,6 +2,7 @@ package com.careerlog.global.exception;
 
 import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.auth.exception.DuplicateEmailException;
+import com.careerlog.auth.exception.InvalidLoginException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,6 +43,15 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleDuplicateEmailException(DuplicateEmailException e) {
         return new ErrorResponse(
                 "DUPLICATE_EMAIL",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InvalidLoginException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidLoginException(InvalidLoginException e) {
+        return new ErrorResponse(
+                "INVALID_LOGIN",
                 e.getMessage()
         );
     }
