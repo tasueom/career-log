@@ -11,13 +11,17 @@ public record LoginResponse(
         String email,
 
         @Schema(description = "닉네임", example = "taesu")
-        String nickname
+        String nickname,
+
+        @Schema(description = "JWT Access Token", example = "eyJhbGciOiJIUzI1NiJ9...")
+        String accessToken
 ) {
-    public static LoginResponse from(User user) {
+    public static LoginResponse from(User user, String accessToken) {
         return new LoginResponse(
                 user.getId(),
                 user.getEmail(),
-                user.getNickname()
+                user.getNickname(),
+                accessToken
         );
     }
 }

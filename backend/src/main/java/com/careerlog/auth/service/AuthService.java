@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.careerlog.auth.jwt.JwtTokenProvider;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {
@@ -46,6 +48,8 @@ public class AuthService {
             throw new InvalidLoginException();
         }
 
-        return LoginResponse.from(user);
+        String accessToken = jwtTokenProvider.createAccessToken(user);
+
+        return LoginResponse.from(user, accessToken);
     }
 }
