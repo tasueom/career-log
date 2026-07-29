@@ -1,9 +1,6 @@
 package com.careerlog.auth.controller;
 
-import com.careerlog.auth.dto.LoginRequest;
-import com.careerlog.auth.dto.LoginResponse;
-import com.careerlog.auth.dto.SignupRequest;
-import com.careerlog.auth.dto.SignupResponse;
+import com.careerlog.auth.dto.*;
 import com.careerlog.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,9 +24,15 @@ public class AuthController {
         return authService.signup(request);
     }
 
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다. JWT 발급은 추후 구현 예정입니다.")
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 JWT Access Token을 발급합니다.")
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    @Operation(summary = "Access Token 재발급", description = "Refresh Token을 검증하고 새로운 Access Token을 발급합니다.")
+    @PostMapping("/refresh")
+    public RefreshTokenResponse refreshAccessToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return authService.refreshAccessToken(request);
     }
 }

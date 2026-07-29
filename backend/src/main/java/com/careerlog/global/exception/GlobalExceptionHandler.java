@@ -3,6 +3,7 @@ package com.careerlog.global.exception;
 import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.auth.exception.DuplicateEmailException;
 import com.careerlog.auth.exception.InvalidLoginException;
+import com.careerlog.auth.exception.InvalidRefreshTokenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +53,15 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleInvalidLoginException(InvalidLoginException e) {
         return new ErrorResponse(
                 "INVALID_LOGIN",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidRefreshTokenException(InvalidRefreshTokenException e) {
+        return new ErrorResponse(
+                "INVALID_REFRESH_TOKEN",
                 e.getMessage()
         );
     }

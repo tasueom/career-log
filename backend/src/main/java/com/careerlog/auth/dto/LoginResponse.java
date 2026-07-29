@@ -14,14 +14,18 @@ public record LoginResponse(
         String nickname,
 
         @Schema(description = "JWT Access Token", example = "eyJhbGciOiJIUzI1NiJ9...")
-        String accessToken
+        String accessToken,
+
+        @Schema(description = "JWT Refresh Token", example = "eyJhbGciOiJIUzI1NiJ9...")
+        String refreshToken
 ) {
-    public static LoginResponse from(User user, String accessToken) {
+    public static LoginResponse from(User user, String accessToken, String refreshToken) {
         return new LoginResponse(
                 user.getId(),
                 user.getEmail(),
                 user.getNickname(),
-                accessToken
+                accessToken,
+                refreshToken
         );
     }
 }
