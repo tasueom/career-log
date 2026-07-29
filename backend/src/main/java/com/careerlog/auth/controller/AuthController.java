@@ -27,7 +27,7 @@ public class AuthController {
         return authService.signup(request);
     }
 
-    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인합니다. JWT 발급은 추후 구현 예정입니다.")
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 JWT Access Token을 발급합니다.")
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
