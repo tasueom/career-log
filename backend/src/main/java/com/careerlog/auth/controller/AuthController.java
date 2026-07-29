@@ -1,9 +1,6 @@
 package com.careerlog.auth.controller;
 
-import com.careerlog.auth.dto.LoginRequest;
-import com.careerlog.auth.dto.LoginResponse;
-import com.careerlog.auth.dto.SignupRequest;
-import com.careerlog.auth.dto.SignupResponse;
+import com.careerlog.auth.dto.*;
 import com.careerlog.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,5 +28,11 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    @Operation(summary = "Access Token 재발급", description = "Refresh Token을 검증하고 새로운 Access Token을 발급합니다.")
+    @PostMapping("/refresh")
+    public RefreshTokenResponse refreshAccessToken(@Valid @RequestBody RefreshTokenRequest request) {
+        return authService.refreshAccessToken(request);
     }
 }

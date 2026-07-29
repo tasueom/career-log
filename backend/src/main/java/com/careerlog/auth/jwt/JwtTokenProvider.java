@@ -1,6 +1,8 @@
 package com.careerlog.auth.jwt;
 
 import com.careerlog.user.entity.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +15,10 @@ import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
+
+    private static final String TOKEN_TYPE_CLAIM = "tokenType";
+    private static final String ACCESS_TOKEN_TYPE = "ACCESS";
+    private static final String REFRESH_TOKEN_TYPE = "REFRESH";
 
     private final SecretKey secretKey;
     private final long accessTokenExpirationMs;
@@ -34,6 +40,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .subject(String.valueOf(user.getId()))
+                .claim(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE)
                 .claim("email", user.getEmail())
                 .claim("nickname", user.getNickname())
                 .issuedAt(now)
@@ -48,6 +55,7 @@ public class JwtTokenProvider {
 
         return Jwts.builder()
                 .subject(String.valueOf(user.getId()))
+                .claim(TOKEN_TYPE_CLAIM, REFRESH_TOKEN_TYPE)
                 .issuedAt(now)
                 .expiration(expiresAt)
                 .signWith(secretKey)
@@ -57,5 +65,31 @@ public class JwtTokenProvider {
     public LocalDateTime getRefreshTokenExpiresAt() {
         return LocalDateTime.now()
                 .plusSeconds(refreshTokenExpirationMs / 1000);
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            parseClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public Long getUserId(String token) {
+        return Long.valueOf(parseClaims(token).getSubject());
+    }
+
+    public boolean isRefreshToken(String token) {
+        String tokenType = parseClaims(token).get(TOKEN_TYPE_CLAIM, String.class);
+        return REFRESH_TOKEN_TYPE.equals(tokenType);
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }

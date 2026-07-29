@@ -1,11 +1,9 @@
 package com.careerlog.auth.service;
 
-import com.careerlog.auth.dto.LoginRequest;
-import com.careerlog.auth.dto.LoginResponse;
-import com.careerlog.auth.dto.SignupRequest;
-import com.careerlog.auth.dto.SignupResponse;
+import com.careerlog.auth.dto.*;
 import com.careerlog.auth.exception.DuplicateEmailException;
 import com.careerlog.auth.exception.InvalidLoginException;
+import com.careerlog.auth.exception.InvalidRefreshTokenException;
 import com.careerlog.user.entity.User;
 import com.careerlog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -64,5 +62,32 @@ public class AuthService {
                 );
 
         return LoginResponse.from(user, accessToken, refreshToken);
+    }
+
+    @Transactional(readOnly = true)
+    public RefreshTokenResponse refreshAccessToken(RefreshTokenRequest request) {
+        String refreshToken = request.refreshToken();
+
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        RefreshToken savedRefreshToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(InvalidRefreshTokenException::new);
+
+        User user = savedRefreshToken.getUser();
+
+        Long tokenUserId = jwtTokenProvider.getUserId(refreshToken);
+        if (!user.getId().equals(tokenUserId)) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        String newAccessToken = jwtTokenProvider.createAccessToken(user);
+
+        return RefreshTokenResponse.from(newAccessToken);
     }
 }
