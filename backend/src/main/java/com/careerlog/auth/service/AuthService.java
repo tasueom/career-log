@@ -13,6 +13,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.careerlog.auth.jwt.JwtTokenProvider;
+import com.careerlog.auth.entity.RefreshToken;
+import com.careerlog.auth.repository.RefreshTokenRepository;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public SignupResponse signup(SignupRequest request) {
@@ -40,6 +44,7 @@ public class AuthService {
         return SignupResponse.from(savedUser);
     }
 
+    @Transactional
     public LoginResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(InvalidLoginException::new);
@@ -49,7 +54,15 @@ public class AuthService {
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(user);
+        String refreshToken = jwtTokenProvider.createRefreshToken(user);
+        LocalDateTime refreshTokenExpiresAt = jwtTokenProvider.getRefreshTokenExpiresAt();
 
-        return LoginResponse.from(user, accessToken);
+        refreshTokenRepository.findByUserId(user.getId())
+                .ifPresentOrElse(
+                        existingRefreshToken -> existingRefreshToken.update(refreshToken, refreshTokenExpiresAt),
+                        () -> refreshTokenRepository.save(new RefreshToken(user, refreshToken, refreshTokenExpiresAt))
+                );
+
+        return LoginResponse.from(user, accessToken, refreshToken);
     }
 }
