@@ -80,6 +80,19 @@ public class JwtTokenProvider {
         return Long.valueOf(parseClaims(token).getSubject());
     }
 
+    public String getEmail(String token) {
+        return parseClaims(token).get("email", String.class);
+    }
+
+    public String getNickname(String token) {
+        return parseClaims(token).get("nickname", String.class);
+    }
+
+    public boolean isAccessToken(String token) {
+        String tokenType = parseClaims(token).get(TOKEN_TYPE_CLAIM, String.class);
+        return ACCESS_TOKEN_TYPE.equals(tokenType);
+    }
+
     public boolean isRefreshToken(String token) {
         String tokenType = parseClaims(token).get(TOKEN_TYPE_CLAIM, String.class);
         return REFRESH_TOKEN_TYPE.equals(tokenType);
