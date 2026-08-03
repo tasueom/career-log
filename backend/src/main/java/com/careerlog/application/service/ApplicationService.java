@@ -7,6 +7,9 @@ import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.entity.Application;
 import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.application.repository.ApplicationRepository;
+import com.careerlog.user.entity.User;
+import com.careerlog.user.exception.UserNotFoundException;
+import com.careerlog.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +22,15 @@ import java.util.List;
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public ApplicationResponse create(ApplicationCreateRequest request) {
+    public ApplicationResponse create(Long userId, ApplicationCreateRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
         Application application = new Application(
+                user,
                 request.companyName(),
                 request.positionTitle(),
                 request.jobUrl(),
@@ -40,15 +48,15 @@ public class ApplicationService {
         return ApplicationResponse.from(savedApplication);
     }
 
-    public List<ApplicationResponse> findAll() {
-        return applicationRepository.findAll()
+    public List<ApplicationResponse> findAll(Long userId) {
+        return applicationRepository.findAllByUserId(userId)
                 .stream()
                 .map(ApplicationResponse::from)
                 .toList();
     }
 
-    public ApplicationResponse findById(Long applicationId) {
-        Application application = applicationRepository.findById(applicationId)
+    public ApplicationResponse findById(Long userId, Long applicationId) {
+        Application application = applicationRepository.findByIdAndUserId(applicationId, userId)
                 .orElseThrow(ApplicationNotFoundException::new);
 
         return ApplicationResponse.from(application);

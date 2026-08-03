@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
+import com.careerlog.user.entity.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -19,7 +19,9 @@ public class Application extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: Auth 구현 후 User 연관관계 추가 예정
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false, length = 100)
     private String companyName;
@@ -51,6 +53,7 @@ public class Application extends BaseTimeEntity {
     private String memo;
 
     public Application(
+            User user,
             String companyName,
             String positionTitle,
             String jobUrl,
@@ -62,6 +65,7 @@ public class Application extends BaseTimeEntity {
             LocalDateTime nextActionAt,
             String memo
     ) {
+        this.user = user;
         this.companyName = companyName;
         this.positionTitle = positionTitle;
         this.jobUrl = jobUrl;
