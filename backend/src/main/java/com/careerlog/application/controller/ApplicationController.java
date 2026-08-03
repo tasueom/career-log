@@ -34,7 +34,7 @@ public class ApplicationController {
         return applicationService.create(authUser.id(), request);
     }
 
-    @Operation(summary = "지원 건 목록 조회", description = "등록된 지원 건 목록을 조회합니다.")
+    @Operation(summary = "지원 건 목록 조회", description = "로그인 사용자의 지원 건 목록을 조회합니다.")
     @GetMapping
     public List<ApplicationResponse> findAll(@AuthenticationPrincipal AuthUser authUser) {
         return applicationService.findAll(authUser.id());
