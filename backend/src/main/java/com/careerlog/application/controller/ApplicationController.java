@@ -40,10 +40,12 @@ public class ApplicationController {
         return applicationService.findAll(authUser.id());
     }
 
-    @Operation(summary = "지원 건 상세 조회", description = "지원 건 ID로 상세 정보를 조회합니다.")
+    @Operation(summary = "지원 건 상세 조회", description = "로그인 사용자의 지원 건 상세 정보를 조회합니다.")
     @GetMapping("/{applicationId}")
-    public ApplicationResponse findById(@PathVariable Long applicationId) {
-        return applicationService.findById(applicationId);
+    public ApplicationResponse findById(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long applicationId) {
+        return applicationService.findById(authUser.id(), applicationId);
     }
 
     @Operation(summary = "지원 건 수정", description = "지원 건의 회사명, 직무명, 상태, 우선순위, 일정, 메모 등을 수정합니다.")

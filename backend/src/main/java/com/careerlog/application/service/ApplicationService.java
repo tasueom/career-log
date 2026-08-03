@@ -55,8 +55,8 @@ public class ApplicationService {
                 .toList();
     }
 
-    public ApplicationResponse findById(Long applicationId) {
-        Application application = applicationRepository.findById(applicationId)
+    public ApplicationResponse findById(Long userId, Long applicationId) {
+        Application application = applicationRepository.findByIdAndUserId(applicationId, userId)
                 .orElseThrow(ApplicationNotFoundException::new);
 
         return ApplicationResponse.from(application);
