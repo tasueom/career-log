@@ -63,8 +63,8 @@ public class ApplicationService {
     }
 
     @Transactional
-    public ApplicationResponse update(Long applicationId, ApplicationUpdateRequest request) {
-        Application application = applicationRepository.findById(applicationId)
+    public ApplicationResponse update(Long userId, Long applicationId, ApplicationUpdateRequest request) {
+        Application application = applicationRepository.findByIdAndUserId(applicationId,userId)
                 .orElseThrow(ApplicationNotFoundException::new);
 
         application.update(
@@ -84,8 +84,8 @@ public class ApplicationService {
     }
 
     @Transactional
-    public ApplicationResponse updateStatus(Long applicationId, ApplicationStatusUpdateRequest request){
-        Application application = applicationRepository.findById(applicationId)
+    public ApplicationResponse updateStatus(Long userId, Long applicationId, ApplicationStatusUpdateRequest request){
+        Application application = applicationRepository.findByIdAndUserId(applicationId, userId)
                 .orElseThrow(ApplicationNotFoundException::new);
 
         application.updateStatus(request.status());
@@ -94,8 +94,8 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void delete(Long applicationId){
-        Application application = applicationRepository.findById(applicationId)
+    public void delete(Long userId, Long applicationId){
+        Application application = applicationRepository.findByIdAndUserId(applicationId, userId)
                 .orElseThrow(ApplicationNotFoundException::new);
 
         applicationRepository.delete(application);

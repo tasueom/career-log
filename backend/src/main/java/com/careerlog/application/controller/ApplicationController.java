@@ -48,28 +48,33 @@ public class ApplicationController {
         return applicationService.findById(authUser.id(), applicationId);
     }
 
-    @Operation(summary = "지원 건 수정", description = "지원 건의 회사명, 직무명, 상태, 우선순위, 일정, 메모 등을 수정합니다.")
+    @Operation(summary = "지원 건 수정", description = "로그인 사용자의 지원 건 정보를 수정합니다.")
     @PutMapping("/{applicationId}")
     public ApplicationResponse update(
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long applicationId,
             @Valid @RequestBody ApplicationUpdateRequest request
     ) {
-        return applicationService.update(applicationId, request);
+        return applicationService.update(authUser.id(), applicationId, request);
     }
 
-    @Operation(summary = "지원 상태 변경", description = "지원 건의 상태만 별도로 변경합니다.")
+    @Operation(summary = "지원 상태 변경", description = "로그인 사용자의 지원 건 상태만 별도로 변경합니다.")
     @PatchMapping("/{applicationId}/status")
     public ApplicationResponse updateStatus(
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long applicationId,
             @Valid @RequestBody ApplicationStatusUpdateRequest request
     ) {
-        return applicationService.updateStatus(applicationId, request);
+        return applicationService.updateStatus(authUser.id(), applicationId, request);
     }
 
-    @Operation(summary = "지원 건 삭제", description = "지원 건 ID로 지원 건을 삭제합니다.")
+    @Operation(summary = "지원 건 삭제", description = "로그인 사용자의 지원 건을 삭제합니다.")
     @DeleteMapping("/{applicationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long applicationId){
-        applicationService.delete(applicationId);
+    public void delete(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long applicationId
+    ){
+        applicationService.delete(authUser.id(), applicationId);
     }
 }
