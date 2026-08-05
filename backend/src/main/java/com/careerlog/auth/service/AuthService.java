@@ -90,4 +90,22 @@ public class AuthService {
 
         return RefreshTokenResponse.from(newAccessToken);
     }
+
+    @Transactional
+    public void logout(LogoutRequest request) {
+        String refreshToken = request.refreshToken();
+
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
+            throw new InvalidRefreshTokenException();
+        }
+
+        RefreshToken savedRefreshToken = refreshTokenRepository.findByToken(refreshToken)
+                .orElseThrow(InvalidRefreshTokenException::new);
+
+        refreshTokenRepository.delete(savedRefreshToken);
+    }
 }
