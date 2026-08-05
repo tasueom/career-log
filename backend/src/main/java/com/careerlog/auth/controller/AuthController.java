@@ -35,4 +35,11 @@ public class AuthController {
     public RefreshTokenResponse refreshAccessToken(@Valid @RequestBody RefreshTokenRequest request) {
         return authService.refreshAccessToken(request);
     }
+
+    @Operation(summary = "로그아웃", description = "Refresh Token을 삭제하여 로그아웃 처리합니다.")
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@Valid @RequestBody LogoutRequest request) {
+        authService.logout(request);
+    }
 }
