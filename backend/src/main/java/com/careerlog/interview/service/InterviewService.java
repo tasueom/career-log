@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -45,5 +47,18 @@ public class InterviewService {
         Interview savedInterview = interviewRepository.save(interview);
 
         return InterviewResponse.from(savedInterview);
+    }
+
+    public List<InterviewResponse> findAllByApplication(
+            Long userId,
+            Long applicationId
+    ) {
+        applicationRepository.findByIdAndUserId(applicationId, userId)
+                .orElseThrow(ApplicationNotFoundException::new);
+
+        return interviewRepository.findAllByApplicationIdAndUserId(applicationId, userId)
+                .stream()
+                .map(InterviewResponse::from)
+                .toList();
     }
 }
