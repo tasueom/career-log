@@ -6,6 +6,7 @@ import com.careerlog.application.repository.ApplicationRepository;
 import com.careerlog.interview.dto.InterviewCreateRequest;
 import com.careerlog.interview.dto.InterviewResponse;
 import com.careerlog.interview.entity.Interview;
+import com.careerlog.interview.exception.InterviewNotFoundException;
 import com.careerlog.interview.repository.InterviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,5 +61,13 @@ public class InterviewService {
                 .stream()
                 .map(InterviewResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public void delete(Long userId, Long interviewId) {
+        Interview interview = interviewRepository.findByIdAndUserId(interviewId, userId)
+                .orElseThrow(InterviewNotFoundException::new);
+
+        interviewRepository.delete(interview);
     }
 }
