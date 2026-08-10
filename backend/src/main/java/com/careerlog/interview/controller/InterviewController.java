@@ -41,6 +41,15 @@ public class InterviewController {
         return interviewService.findAllByApplication(authUser.id(), applicationId);
     }
 
+    @Operation(summary = "면접 기록 단건 조회", description = "로그인 사용자의 면접 기록을 단건 조회합니다.")
+    @GetMapping("/api/interviews/{interviewId}")
+    public InterviewResponse findById(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long interviewId
+    ) {
+        return interviewService.findById(authUser.id(), interviewId);
+    }
+
     @Operation(summary = "면접 기록 삭제", description = "로그인 사용자의 면접 기록을 삭제합니다.")
     @DeleteMapping("/api/interviews/{interviewId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

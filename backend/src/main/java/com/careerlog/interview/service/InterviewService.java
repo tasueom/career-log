@@ -63,6 +63,13 @@ public class InterviewService {
                 .toList();
     }
 
+    public InterviewResponse findById(Long userId, Long interviewId) {
+        Interview interview = interviewRepository.findByIdAndUserId(interviewId, userId)
+                .orElseThrow(InterviewNotFoundException::new);
+
+        return InterviewResponse.from(interview);
+    }
+
     @Transactional
     public void delete(Long userId, Long interviewId) {
         Interview interview = interviewRepository.findByIdAndUserId(interviewId, userId)
