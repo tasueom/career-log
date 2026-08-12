@@ -5,6 +5,7 @@ import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.application.repository.ApplicationRepository;
 import com.careerlog.interview.dto.InterviewCreateRequest;
 import com.careerlog.interview.dto.InterviewResponse;
+import com.careerlog.interview.dto.InterviewUpdateRequest;
 import com.careerlog.interview.entity.Interview;
 import com.careerlog.interview.exception.InterviewNotFoundException;
 import com.careerlog.interview.repository.InterviewRepository;
@@ -66,6 +67,30 @@ public class InterviewService {
     public InterviewResponse findById(Long userId, Long interviewId) {
         Interview interview = interviewRepository.findByIdAndUserId(interviewId, userId)
                 .orElseThrow(InterviewNotFoundException::new);
+
+        return InterviewResponse.from(interview);
+    }
+
+    @Transactional
+    public InterviewResponse update(
+            Long userId,
+            Long interviewId,
+            InterviewUpdateRequest request
+    ) {
+        Interview interview = interviewRepository.findByIdAndUserId(interviewId, userId)
+                .orElseThrow(InterviewNotFoundException::new);
+
+        interview.update(
+                request.interviewType(),
+                request.scheduledAt(),
+                request.location(),
+                request.interviewerCount(),
+                request.difficulty(),
+                request.atmosphere(),
+                request.overallReview(),
+                request.result(),
+                request.nextPreparation()
+        );
 
         return InterviewResponse.from(interview);
     }

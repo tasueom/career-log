@@ -3,6 +3,7 @@ package com.careerlog.interview.controller;
 import com.careerlog.auth.security.AuthUser;
 import com.careerlog.interview.dto.InterviewCreateRequest;
 import com.careerlog.interview.dto.InterviewResponse;
+import com.careerlog.interview.dto.InterviewUpdateRequest;
 import com.careerlog.interview.service.InterviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,6 +49,16 @@ public class InterviewController {
             @PathVariable Long interviewId
     ) {
         return interviewService.findById(authUser.id(), interviewId);
+    }
+
+    @Operation(summary = "면접 기록 수정", description = "로그인 사용자의 면접 기록을 수정합니다.")
+    @PutMapping("/api/interviews/{interviewId}")
+    public InterviewResponse update(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long interviewId,
+            @Valid @RequestBody InterviewUpdateRequest request
+    ) {
+        return interviewService.update(authUser.id(), interviewId, request);
     }
 
     @Operation(summary = "면접 기록 삭제", description = "로그인 사용자의 면접 기록을 삭제합니다.")
