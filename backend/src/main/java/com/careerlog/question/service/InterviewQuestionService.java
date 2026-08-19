@@ -6,10 +6,13 @@ import com.careerlog.interview.repository.InterviewRepository;
 import com.careerlog.question.dto.InterviewQuestionCreateRequest;
 import com.careerlog.question.dto.InterviewQuestionResponse;
 import com.careerlog.question.entity.InterviewQuestion;
+import com.careerlog.question.exception.InterviewQuestionNotFoundException;
 import com.careerlog.question.repository.InterviewQuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +48,28 @@ public class InterviewQuestionService {
         InterviewQuestion savedQuestion = interviewQuestionRepository.save(question);
 
         return InterviewQuestionResponse.from(savedQuestion);
+    }
+
+    public List<InterviewQuestionResponse> findAllByInterview(
+            Long userId,
+            Long interviewId
+    ) {
+        interviewRepository.findByIdAndUserId(interviewId, userId)
+                .orElseThrow(InterviewNotFoundException::new);
+
+        return interviewQuestionRepository.findAllByInterviewIdAndUserId(interviewId, userId)
+                .stream()
+                .map(InterviewQuestionResponse::from)
+                .toList();
+    }
+
+    public InterviewQuestionResponse findById(
+            Long userId,
+            Long questionId
+    ) {
+        InterviewQuestion question = interviewQuestionRepository.findByIdAndUserId(questionId, userId)
+                .orElseThrow(InterviewQuestionNotFoundException::new);
+
+        return InterviewQuestionResponse.from(question);
     }
 }
