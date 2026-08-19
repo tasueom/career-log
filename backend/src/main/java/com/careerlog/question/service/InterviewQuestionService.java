@@ -5,6 +5,7 @@ import com.careerlog.interview.exception.InterviewNotFoundException;
 import com.careerlog.interview.repository.InterviewRepository;
 import com.careerlog.question.dto.InterviewQuestionCreateRequest;
 import com.careerlog.question.dto.InterviewQuestionResponse;
+import com.careerlog.question.dto.InterviewQuestionUpdateRequest;
 import com.careerlog.question.entity.InterviewQuestion;
 import com.careerlog.question.exception.InterviewQuestionNotFoundException;
 import com.careerlog.question.repository.InterviewQuestionRepository;
@@ -71,5 +72,40 @@ public class InterviewQuestionService {
                 .orElseThrow(InterviewQuestionNotFoundException::new);
 
         return InterviewQuestionResponse.from(question);
+    }
+
+    @Transactional
+    public InterviewQuestionResponse update(
+            Long userId,
+            Long questionId,
+            InterviewQuestionUpdateRequest request
+    ) {
+        InterviewQuestion question = interviewQuestionRepository.findByIdAndUserId(questionId, userId)
+                .orElseThrow(InterviewQuestionNotFoundException::new);
+
+        question.update(
+                request.questionText(),
+                request.questionType(),
+                request.myAnswer(),
+                request.answerScore(),
+                request.weakness(),
+                request.improvedAnswer(),
+                request.techTags(),
+                request.needReview(),
+                request.memo()
+        );
+
+        return InterviewQuestionResponse.from(question);
+    }
+
+    @Transactional
+    public void delete(
+            Long userId,
+            Long questionId
+    ) {
+        InterviewQuestion question = interviewQuestionRepository.findByIdAndUserId(questionId, userId)
+                .orElseThrow(InterviewQuestionNotFoundException::new);
+
+        interviewQuestionRepository.delete(question);
     }
 }

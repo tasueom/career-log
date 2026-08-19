@@ -3,6 +3,7 @@ package com.careerlog.question.controller;
 import com.careerlog.auth.security.AuthUser;
 import com.careerlog.question.dto.InterviewQuestionCreateRequest;
 import com.careerlog.question.dto.InterviewQuestionResponse;
+import com.careerlog.question.dto.InterviewQuestionUpdateRequest;
 import com.careerlog.question.service.InterviewQuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,5 +49,25 @@ public class InterviewQuestionController {
             @PathVariable Long questionId
     ) {
         return interviewQuestionService.findById(authUser.id(), questionId);
+    }
+
+    @Operation(summary = "면접 질문 수정", description = "로그인 사용자의 면접 질문을 수정합니다.")
+    @PutMapping("/api/questions/{questionId}")
+    public InterviewQuestionResponse update(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long questionId,
+            @Valid @RequestBody InterviewQuestionUpdateRequest request
+    ) {
+        return interviewQuestionService.update(authUser.id(), questionId, request);
+    }
+
+    @Operation(summary = "면접 질문 삭제", description = "로그인 사용자의 면접 질문을 삭제합니다.")
+    @DeleteMapping("/api/questions/{questionId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long questionId
+    ) {
+        interviewQuestionService.delete(authUser.id(), questionId);
     }
 }
