@@ -5,6 +5,7 @@ import com.careerlog.auth.exception.DuplicateEmailException;
 import com.careerlog.auth.exception.InvalidLoginException;
 import com.careerlog.auth.exception.InvalidRefreshTokenException;
 import com.careerlog.interview.exception.InterviewNotFoundException;
+import com.careerlog.question.exception.InterviewQuestionNotFoundException;
 import com.careerlog.user.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -82,6 +83,15 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleInterviewNotFoundException(InterviewNotFoundException e) {
         return new ErrorResponse(
                 "INTERVIEW_NOT_FOUND",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InterviewQuestionNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleInterviewQuestionNotFoundException(InterviewQuestionNotFoundException e) {
+        return new ErrorResponse(
+                "INTERVIEW_QUESTION_NOT_FOUND",
                 e.getMessage()
         );
     }
