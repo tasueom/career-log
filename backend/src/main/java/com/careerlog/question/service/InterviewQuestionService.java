@@ -1,0 +1,111 @@
+package com.careerlog.question.service;
+
+import com.careerlog.interview.entity.Interview;
+import com.careerlog.interview.exception.InterviewNotFoundException;
+import com.careerlog.interview.repository.InterviewRepository;
+import com.careerlog.question.dto.InterviewQuestionCreateRequest;
+import com.careerlog.question.dto.InterviewQuestionResponse;
+import com.careerlog.question.dto.InterviewQuestionUpdateRequest;
+import com.careerlog.question.entity.InterviewQuestion;
+import com.careerlog.question.exception.InterviewQuestionNotFoundException;
+import com.careerlog.question.repository.InterviewQuestionRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class InterviewQuestionService {
+
+    private final InterviewQuestionRepository interviewQuestionRepository;
+    private final InterviewRepository interviewRepository;
+
+    @Transactional
+    public InterviewQuestionResponse create(
+            Long userId,
+            Long interviewId,
+            InterviewQuestionCreateRequest request
+    ) {
+        Interview interview = interviewRepository.findByIdAndUserId(interviewId, userId)
+                .orElseThrow(InterviewNotFoundException::new);
+
+        InterviewQuestion question = new InterviewQuestion(
+                interview.getUser(),
+                interview,
+                request.questionText(),
+                request.questionType(),
+                request.myAnswer(),
+                request.answerScore(),
+                request.weakness(),
+                request.improvedAnswer(),
+                request.techTags(),
+                request.needReview(),
+                request.memo()
+        );
+
+        InterviewQuestion savedQuestion = interviewQuestionRepository.save(question);
+
+        return InterviewQuestionResponse.from(savedQuestion);
+    }
+
+    public List<InterviewQuestionResponse> findAllByInterview(
+            Long userId,
+            Long interviewId
+    ) {
+        interviewRepository.findByIdAndUserId(interviewId, userId)
+                .orElseThrow(InterviewNotFoundException::new);
+
+        return interviewQuestionRepository.findAllByInterviewIdAndUserId(interviewId, userId)
+                .stream()
+                .map(InterviewQuestionResponse::from)
+                .toList();
+    }
+
+    public InterviewQuestionResponse findById(
+            Long userId,
+            Long questionId
+    ) {
+        InterviewQuestion question = interviewQuestionRepository.findByIdAndUserId(questionId, userId)
+                .orElseThrow(InterviewQuestionNotFoundException::new);
+
+        return InterviewQuestionResponse.from(question);
+    }
+
+    @Transactional
+    public InterviewQuestionResponse update(
+            Long userId,
+            Long questionId,
+            InterviewQuestionUpdateRequest request
+    ) {
+        InterviewQuestion question = interviewQuestionRepository.findByIdAndUserId(questionId, userId)
+                .orElseThrow(InterviewQuestionNotFoundException::new);
+
+        question.update(
+                request.questionText(),
+                request.questionType(),
+                request.myAnswer(),
+                request.answerScore(),
+                request.weakness(),
+                request.improvedAnswer(),
+                request.techTags(),
+                request.needReview(),
+                request.memo()
+        );
+
+        return InterviewQuestionResponse.from(question);
+    }
+
+    @Transactional
+    public void delete(
+            Long userId,
+            Long questionId
+    ) {
+        InterviewQuestion question = interviewQuestionRepository.findByIdAndUserId(questionId, userId)
+                .orElseThrow(InterviewQuestionNotFoundException::new);
+
+        interviewQuestionRepository.delete(question);
+    }
+}
