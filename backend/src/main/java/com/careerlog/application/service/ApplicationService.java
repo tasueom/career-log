@@ -5,6 +5,7 @@ import com.careerlog.application.dto.ApplicationResponse;
 import com.careerlog.application.dto.ApplicationStatusUpdateRequest;
 import com.careerlog.application.dto.ApplicationUpdateRequest;
 import com.careerlog.application.entity.Application;
+import com.careerlog.application.entity.ApplicationStatus;
 import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.application.repository.ApplicationRepository;
 import com.careerlog.user.entity.User;
@@ -48,11 +49,25 @@ public class ApplicationService {
         return ApplicationResponse.from(savedApplication);
     }
 
-    public List<ApplicationResponse> findAll(Long userId) {
-        return applicationRepository.findAllByUserId(userId)
+    public List<ApplicationResponse> findAll(
+            Long userId,
+            ApplicationStatus status,
+            String keyword
+    ) {
+        String normalizedKeyword = normalizeKeyword(keyword);
+
+        return applicationRepository.searchByUser(userId, status, normalizedKeyword)
                 .stream()
                 .map(ApplicationResponse::from)
                 .toList();
+    }
+
+    private String normalizeKeyword(String keyword) {
+        if (keyword == null || keyword.isBlank()) {
+            return null;
+        }
+
+        return keyword.trim();
     }
 
     public ApplicationResponse findById(Long userId, Long applicationId) {

@@ -4,6 +4,7 @@ import com.careerlog.application.dto.ApplicationCreateRequest;
 import com.careerlog.application.dto.ApplicationResponse;
 import com.careerlog.application.dto.ApplicationStatusUpdateRequest;
 import com.careerlog.application.dto.ApplicationUpdateRequest;
+import com.careerlog.application.entity.ApplicationStatus;
 import com.careerlog.application.service.ApplicationService;
 import com.careerlog.auth.security.AuthUser;
 import jakarta.validation.Valid;
@@ -34,10 +35,14 @@ public class ApplicationController {
         return applicationService.create(authUser.id(), request);
     }
 
-    @Operation(summary = "지원 건 목록 조회", description = "로그인 사용자의 지원 건 목록을 조회합니다.")
+    @Operation(summary = "지원 건 목록 조회", description = "로그인 사용자의 지원 건 목록을 상태와 키워드로 조회합니다.")
     @GetMapping
-    public List<ApplicationResponse> findAll(@AuthenticationPrincipal AuthUser authUser) {
-        return applicationService.findAll(authUser.id());
+    public List<ApplicationResponse> findAll(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(required = false) ApplicationStatus status,
+            @RequestParam(required = false) String keyword
+    ) {
+        return applicationService.findAll(authUser.id(), status, keyword);
     }
 
     @Operation(summary = "지원 건 상세 조회", description = "로그인 사용자의 지원 건 상세 정보를 조회합니다.")
