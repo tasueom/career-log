@@ -6,6 +6,7 @@ import com.careerlog.interview.repository.InterviewRepository;
 import com.careerlog.question.dto.InterviewQuestionCreateRequest;
 import com.careerlog.question.dto.InterviewQuestionResponse;
 import com.careerlog.question.dto.InterviewQuestionUpdateRequest;
+import com.careerlog.question.dto.NeedReviewUpdateRequest;
 import com.careerlog.question.entity.InterviewQuestion;
 import com.careerlog.question.exception.InterviewQuestionNotFoundException;
 import com.careerlog.question.repository.InterviewQuestionRepository;
@@ -107,5 +108,26 @@ public class InterviewQuestionService {
                 .orElseThrow(InterviewQuestionNotFoundException::new);
 
         interviewQuestionRepository.delete(question);
+    }
+
+    public List<InterviewQuestionResponse> findReviewTargets(Long userId) {
+        return interviewQuestionRepository.findAllByUserIdAndNeedReviewTrue(userId)
+                .stream()
+                .map(InterviewQuestionResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public InterviewQuestionResponse updateNeedReview(
+            Long userId,
+            Long questionId,
+            NeedReviewUpdateRequest request
+    ) {
+        InterviewQuestion question = interviewQuestionRepository.findByIdAndUserId(questionId, userId)
+                .orElseThrow(InterviewQuestionNotFoundException::new);
+
+        question.updateNeedReview(request.needReview());
+
+        return InterviewQuestionResponse.from(question);
     }
 }

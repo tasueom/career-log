@@ -4,6 +4,7 @@ import com.careerlog.auth.security.AuthUser;
 import com.careerlog.question.dto.InterviewQuestionCreateRequest;
 import com.careerlog.question.dto.InterviewQuestionResponse;
 import com.careerlog.question.dto.InterviewQuestionUpdateRequest;
+import com.careerlog.question.dto.NeedReviewUpdateRequest;
 import com.careerlog.question.service.InterviewQuestionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -69,5 +70,23 @@ public class InterviewQuestionController {
             @PathVariable Long questionId
     ) {
         interviewQuestionService.delete(authUser.id(), questionId);
+    }
+
+    @Operation(summary = "복습 대상 질문 목록 조회", description = "로그인 사용자의 복습 필요 질문 목록을 조회합니다.")
+    @GetMapping("/api/review-targets")
+    public List<InterviewQuestionResponse> findReviewTargets(
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        return interviewQuestionService.findReviewTargets(authUser.id());
+    }
+
+    @Operation(summary = "복습 필요 여부 변경", description = "로그인 사용자의 면접 질문 복습 필요 여부를 변경합니다.")
+    @PatchMapping("/api/questions/{questionId}/need-review")
+    public InterviewQuestionResponse updateNeedReview(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long questionId,
+            @Valid @RequestBody NeedReviewUpdateRequest request
+    ) {
+        return interviewQuestionService.updateNeedReview(authUser.id(), questionId, request);
     }
 }
