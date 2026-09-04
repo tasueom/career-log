@@ -56,8 +56,17 @@ public class ApplicationService {
     ) {
         String normalizedKeyword = normalizeKeyword(keyword);
 
-        return applicationRepository.searchByUser(userId, status, normalizedKeyword)
-                .stream()
+        List<Application> applications;
+
+        if (status == null && normalizedKeyword == null) {
+            applications = applicationRepository.findAllByUserId(userId);
+        } else if (status != null && normalizedKeyword == null) {
+            applications = applicationRepository.findAllByUserIdAndStatus(userId, status);
+        } else {
+            applications = applicationRepository.searchByUser(userId, status, normalizedKeyword);
+        }
+
+        return applications.stream()
                 .map(ApplicationResponse::from)
                 .toList();
     }

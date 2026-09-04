@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
-    
+
+    List<Application> findAllByUserId(Long userId);
+
+    List<Application> findAllByUserIdAndStatus(Long userId, ApplicationStatus status);
+
     Optional<Application> findByIdAndUserId(Long id, Long userId);
 
     @Query("""
@@ -18,8 +22,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             WHERE a.user.id = :userId
               AND (:status IS NULL OR a.status = :status)
               AND (
-                    :keyword IS NULL
-                    OR LOWER(a.companyName) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                    LOWER(a.companyName) LIKE LOWER(CONCAT('%', :keyword, '%'))
                     OR LOWER(a.positionTitle) LIKE LOWER(CONCAT('%', :keyword, '%'))
               )
             ORDER BY a.updatedAt DESC, a.id DESC
