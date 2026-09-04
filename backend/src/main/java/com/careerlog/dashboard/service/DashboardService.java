@@ -22,11 +22,7 @@ public class DashboardService {
     private final InterviewQuestionRepository interviewQuestionRepository;
 
     public DashboardSummaryResponse getSummary(Long userId) {
-        List<Application> applications = applicationRepository.searchByUser(
-                userId,
-                null,
-                null
-        );
+        List<Application> applications = applicationRepository.findAllByUserId(userId);
 
         Map<ApplicationStatus, Long> statusCounts = createEmptyStatusCounts();
 
