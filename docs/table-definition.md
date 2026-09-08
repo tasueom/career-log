@@ -1,9 +1,9 @@
 # CareerLog 테이블 정의서
 
-> CareerLog 1차 MVP 기준의 초기 데이터베이스 설계 문서입니다.  
-> 개발 진행에 따라 컬럼명, 타입, 제약조건은 실제 엔티티와 함께 변경될 수 있습니다.
+> CareerLog 1차 MVP 기준의 현재 JPA 엔티티와 데이터베이스 구조를 정리한 문서입니다.
+> 컬럼명, 타입과 제약조건은 현재 엔티티 매핑을 기준으로 합니다.
 >
-> 최종 수정일: 2026-07-19
+> 최종 수정일: 2026-09-08
 
 ## 1. 문서 개요
 
@@ -14,10 +14,10 @@ CareerLog는 사용자의 취업 지원 현황, 면접 기록, 면접 질문과 
 | 테이블명 | 설명 | 현재 상태 |
 |---|---|---|
 | `users` | 사용자 계정 정보 | 구현 |
-| `applications` | 취업 지원 건 정보 | 일부 구현 |
-| `refresh_tokens` | JWT Refresh Token 정보 | 설계 |
-| `interviews` | 지원 건별 면접 기록 | 설계 |
-| `interview_questions` | 면접 질문 및 답변 회고 | 설계 |
+| `applications` | 취업 지원 건 정보 | 구현 |
+| `refresh_tokens` | JWT Refresh Token 정보 | 구현 |
+| `interviews` | 지원 건별 면접 기록 | 구현 |
+| `interview_questions` | 면접 질문 및 답변 회고 | 구현 |
 
 ### 공통 규칙
 
@@ -41,19 +41,18 @@ CareerLog는 사용자의 취업 지원 현황, 면접 기록, 면접 질문과 
 | 컬럼명 | 데이터 타입 | NULL | 키 | 기본값 | 설명 |
 |---|---|---:|---|---|---|
 | `id` | `BIGINT` | N | PK | 자동 증가 | 사용자 식별자 |
-| `email` | `VARCHAR(255)` | N | UK | - | 로그인에 사용하는 이메일 |
+| `email` | `VARCHAR(100)` | N | UK | - | 로그인에 사용하는 이메일 |
 | `password_hash` | `VARCHAR(255)` | N | - | - | 단방향 암호화된 비밀번호 |
 | `nickname` | `VARCHAR(50)` | N | - | - | 서비스에서 표시할 사용자 이름 |
 | `created_at` | `TIMESTAMP` | N | - | JPA Auditing | 생성 일시 |
 | `updated_at` | `TIMESTAMP` | N | - | JPA Auditing | 마지막 수정 일시 |
 
-### 제약조건 및 인덱스
+### 제약조건
 
 | 구분 | 대상 | 설명 |
 |---|---|---|
 | Primary Key | `id` | 사용자 식별자 |
 | Unique | `email` | 동일한 이메일의 중복 가입 방지 |
-| Index | `email` | 로그인 시 사용자 조회 성능 개선. Unique 제약조건으로 인덱스가 생성될 수 있음 |
 
 ### 보안 정책
 
@@ -111,20 +110,17 @@ MVP에서는 회사와 채용 공고를 별도 테이블로 분리하지 않고 
 | `MEDIUM` | 보통 |
 | `HIGH` | 높음 |
 
-### 제약조건 및 인덱스
+### 제약조건
 
 | 구분 | 대상 | 설명 |
 |---|---|---|
 | Primary Key | `id` | 지원 건 식별자 |
 | Foreign Key | `user_id` → `users.id` | 지원 건 소유 사용자 참조 |
-| Index | `user_id` | 사용자별 지원 목록 조회 |
-| Composite Index | `user_id`, `status` | 사용자별 지원 상태 필터링 |
-| Index | `next_action_at` | 예정된 다음 작업 조회 및 알림 확장 |
 
 ### 삭제 정책
 
-- 사용자가 삭제되면 해당 사용자의 지원 건도 함께 삭제하는 방식을 고려합니다.
-- 초기 구현에서는 JPA 연관관계와 서비스 정책이 확정된 후 `CASCADE` 또는 명시적 삭제 중 하나를 선택합니다.
+- 지원 건 삭제 시 서비스 계층에서 하위 `interview_questions`, `interviews`, `applications` 순으로 명시적으로 삭제합니다.
+- 삭제 대상 조회와 하위 데이터 삭제 조건에 현재 로그인 사용자의 `user_id`를 함께 사용합니다.
 
 ---
 
@@ -138,26 +134,24 @@ JWT 재발급과 로그아웃 처리를 위한 Refresh Token 정보를 저장합
 |---|---|---:|---|---|---|
 | `id` | `BIGINT` | N | PK | 자동 증가 | Refresh Token 식별자 |
 | `user_id` | `BIGINT` | N | FK | - | 토큰 소유 사용자 |
-| `token` | `VARCHAR(512)` | N | UK | - | Refresh Token 값 |
+| `token` | `TEXT` | N | - | - | Refresh Token 값 |
 | `expires_at` | `TIMESTAMP` | N | - | - | 토큰 만료 일시 |
-| `revoked` | `BOOLEAN` | N | - | `FALSE` | 로그아웃 또는 폐기 여부 |
-| `created_at` | `TIMESTAMP` | N | - | 생성 시각 | 토큰 생성 일시 |
+| `created_at` | `TIMESTAMP` | N | - | JPA Auditing | 토큰 생성 일시 |
+| `updated_at` | `TIMESTAMP` | N | - | JPA Auditing | 토큰 수정 일시 |
 
-### 제약조건 및 인덱스
+### 제약조건
 
 | 구분 | 대상 | 설명 |
 |---|---|---|
 | Primary Key | `id` | Refresh Token 식별자 |
 | Foreign Key | `user_id` → `users.id` | 토큰 소유 사용자 참조 |
-| Unique | `token` | 동일한 토큰의 중복 저장 방지 |
-| Index | `user_id` | 사용자별 토큰 조회 및 일괄 폐기 |
-| Index | `expires_at` | 만료된 토큰 정리 작업 |
+| Unique | `user_id` | 사용자마다 하나의 Refresh Token만 유지 |
 
 ### 보안 고려사항
 
 - 운영 환경에서는 Refresh Token 원문 대신 해시 값을 저장하는 방식을 검토합니다.
-- 로그아웃 시 레코드를 즉시 삭제하거나 `revoked`를 `TRUE`로 변경합니다.
-- Refresh Token Rotation 도입 시 기존 토큰을 폐기하고 새 토큰을 발급합니다.
+- 로그인 시 사용자의 기존 Refresh Token 레코드를 새 값과 만료 일시로 교체합니다.
+- 로그아웃 시 해당 Refresh Token 레코드를 즉시 삭제합니다.
 
 ---
 
@@ -206,23 +200,21 @@ JWT 재발급과 로그아웃 처리를 위한 Refresh Token 정보를 저장합
 | `FAILED` | 탈락 |
 | `UNKNOWN` | 결과를 알 수 없음 |
 
-### 제약조건 및 인덱스
+### 제약조건 및 애플리케이션 검증
 
 | 구분 | 대상 | 설명 |
 |---|---|---|
 | Primary Key | `id` | 면접 식별자 |
 | Foreign Key | `user_id` → `users.id` | 면접 기록 소유 사용자 참조 |
 | Foreign Key | `application_id` → `applications.id` | 소속 지원 건 참조 |
-| Check | `interviewer_count >= 0` | 음수 인원 방지 |
-| Check | `difficulty BETWEEN 1 AND 5` | 난이도 범위 제한. 적용 여부는 구현 시 확정 |
-| Index | `user_id` | 사용자별 면접 조회 |
-| Index | `application_id` | 지원 건 상세의 면접 목록 조회 |
-| Index | `scheduled_at` | 예정 면접 조회 및 정렬 |
+| Request Validation | `interviewer_count >= 1` | 입력 시 1명 이상의 정수만 허용 |
+| Request Validation | `difficulty BETWEEN 1 AND 5` | 입력 시 1점부터 5점만 허용 |
 
 ### 데이터 일관성
 
 - `interviews.user_id`는 `applications.user_id`와 일치해야 합니다.
 - 면접 등록 시 현재 로그인 사용자가 해당 지원 건의 소유자인지 서비스 계층에서 검증합니다.
+- 면접 삭제 시 서비스 계층에서 하위 `interview_questions`를 먼저 삭제합니다.
 
 ---
 
@@ -243,7 +235,7 @@ JWT 재발급과 로그아웃 처리를 위한 Refresh Token 정보를 저장합
 | `answer_score` | `SMALLINT` | Y | - | `NULL` | 답변 자기평가 점수 |
 | `weakness` | `TEXT` | Y | - | `NULL` | 답변에서 부족했던 점 |
 | `improved_answer` | `TEXT` | Y | - | `NULL` | 개선한 답변 |
-| `tech_tags` | `VARCHAR(500)` | Y | - | `NULL` | 기술 태그. MVP에서는 단순 문자열로 관리 |
+| `tech_tags` | `TEXT` | Y | - | `NULL` | 기술 태그. MVP에서는 단순 문자열로 관리 |
 | `need_review` | `BOOLEAN` | N | - | `FALSE` | 복습 필요 여부 |
 | `memo` | `TEXT` | Y | - | `NULL` | 추가 메모 |
 | `created_at` | `TIMESTAMP` | N | - | JPA Auditing | 생성 일시 |
@@ -253,13 +245,13 @@ JWT 재발급과 로그아웃 처리를 위한 Refresh Token 정보를 저장합
 
 | 값 | 설명 |
 |---|---|
-| `TECH_CONCEPT` | 기술 개념 |
-| `PROJECT_EXPERIENCE` | 프로젝트 경험 |
-| `PROBLEM_SOLVING` | 문제 해결 경험 |
-| `COLLABORATION` | 협업 경험 |
-| `PERSONALITY` | 인성 |
-| `COMPANY_JOB` | 회사 및 직무 이해 |
-| `CODING` | 코딩 및 알고리즘 |
+| `TECHNICAL` | 기술 질문 |
+| `PERSONALITY` | 인성·컬처핏 질문 |
+| `PROJECT` | 프로젝트 관련 질문 |
+| `EXPERIENCE` | 과거 경험·이력 관련 질문 |
+| `CS` | 컴퓨터 공학 기초 질문 |
+| `CODING_TEST` | 코딩 테스트·손코딩 질문 |
+| `COMPANY` | 지원 회사·산업 관련 질문 |
 | `OTHER` | 기타 |
 
 ### `answer_score` 기준
@@ -272,18 +264,14 @@ JWT 재발급과 로그아웃 처리를 위한 Refresh Token 정보를 저장합
 | `4` | 꽤 잘 대답함 |
 | `5` | 자신 있게 대답함 |
 
-### 제약조건 및 인덱스
+### 제약조건 및 애플리케이션 검증
 
 | 구분 | 대상 | 설명 |
 |---|---|---|
 | Primary Key | `id` | 면접 질문 식별자 |
 | Foreign Key | `user_id` → `users.id` | 질문 기록 소유 사용자 참조 |
 | Foreign Key | `interview_id` → `interviews.id` | 소속 면접 참조 |
-| Check | `answer_score BETWEEN 1 AND 5` | 답변 점수 범위 제한 |
-| Index | `user_id` | 사용자별 질문 조회 |
-| Index | `interview_id` | 면접 상세의 질문 목록 조회 |
-| Composite Index | `user_id`, `need_review` | 사용자별 복습 대상 질문 조회 |
-| Composite Index | `user_id`, `question_type` | 질문 유형 필터링 |
+| Request Validation | `answer_score BETWEEN 1 AND 5` | 입력 시 답변 점수를 1점부터 5점으로 제한 |
 
 ### 데이터 일관성
 
@@ -298,7 +286,7 @@ JWT 재발급과 로그아웃 처리를 위한 Refresh Token 정보를 저장합
 | 부모 테이블 | 자식 테이블 | 관계 | 설명 |
 |---|---|---|---|
 | `users` | `applications` | 1:N | 한 사용자는 여러 지원 건을 등록할 수 있음 |
-| `users` | `refresh_tokens` | 1:N | 한 사용자는 여러 로그인 세션을 가질 수 있음 |
+| `users` | `refresh_tokens` | 1:0..1 | 한 사용자당 하나의 Refresh Token만 유지 |
 | `users` | `interviews` | 1:N | 한 사용자는 여러 면접 기록을 소유할 수 있음 |
 | `applications` | `interviews` | 1:N | 하나의 지원 건에는 여러 면접이 진행될 수 있음 |
 | `users` | `interview_questions` | 1:N | 한 사용자는 여러 질문 기록을 소유할 수 있음 |
@@ -327,5 +315,6 @@ JWT 재발급과 로그아웃 처리를 위한 Refresh Token 정보를 저장합
 - 실제 엔티티에서 사용하는 문자열 길이에 맞춰 `VARCHAR` 길이를 조정합니다.
 - JPA가 자동 생성한 FK와 인덱스 이름은 환경에 따라 달라질 수 있습니다.
 - 초기 개발에서는 `ddl-auto: update`를 사용하지만, 구조가 안정화되면 Flyway 도입을 검토합니다.
-- 사용자 탈퇴 및 상위 데이터 삭제 시 자식 데이터 처리 방식을 구현 전에 확정합니다.
+- 사용자 탈퇴 기능은 현재 MVP API에 포함하지 않습니다.
+- 현재 엔티티에는 조회·필터용 인덱스가 명시적으로 선언되어 있지 않으며, 데이터 증가 시 별도 적용을 검토합니다.
 - 공개 저장소에는 실제 비밀번호, JWT Secret, DB 접속 비밀번호, 운영 환경 변수를 커밋하지 않습니다.

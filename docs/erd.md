@@ -3,13 +3,13 @@
 > CareerLog 1차 MVP 기준의 논리 ERD입니다.  
 > 개발 진행에 따라 엔티티와 관계는 변경될 수 있습니다.
 >
-> 최종 수정일: 2026-07-19
+> 최종 수정일: 2026-09-08
 
 ## 1. ERD
 
 ```mermaid
 erDiagram
-    USERS ||--o{ REFRESH_TOKENS : "owns"
+    USERS ||--o| REFRESH_TOKENS : "owns"
     USERS ||--o{ APPLICATIONS : "owns"
     USERS ||--o{ INTERVIEWS : "owns"
     USERS ||--o{ INTERVIEW_QUESTIONS : "owns"
@@ -28,10 +28,10 @@ erDiagram
     REFRESH_TOKENS {
         BIGINT id PK
         BIGINT user_id FK
-        VARCHAR token UK
+        TEXT token
         TIMESTAMP expires_at
-        BOOLEAN revoked
         TIMESTAMP created_at
+        TIMESTAMP updated_at
     }
 
     APPLICATIONS {
@@ -78,7 +78,7 @@ erDiagram
         SMALLINT answer_score
         TEXT weakness
         TEXT improved_answer
-        VARCHAR tech_tags
+        TEXT tech_tags
         BOOLEAN need_review
         TEXT memo
         TIMESTAMP created_at
@@ -91,7 +91,7 @@ erDiagram
 | 관계 | 카디널리티 | 설명 |
 |---|---|---|
 | `USERS` → `APPLICATIONS` | 1:N | 한 사용자는 여러 지원 건을 등록할 수 있습니다. |
-| `USERS` → `REFRESH_TOKENS` | 1:N | 한 사용자는 여러 로그인 세션의 Refresh Token을 가질 수 있습니다. |
+| `USERS` → `REFRESH_TOKENS` | 1:0..1 | 한 사용자당 하나의 Refresh Token만 유지하며, 재로그인 시 값을 교체합니다. |
 | `USERS` → `INTERVIEWS` | 1:N | 한 사용자는 여러 면접 기록을 소유할 수 있습니다. |
 | `APPLICATIONS` → `INTERVIEWS` | 1:N | 하나의 지원 건에는 전화면접, 기술면접, 최종면접 등 여러 면접이 연결될 수 있습니다. |
 | `USERS` → `INTERVIEW_QUESTIONS` | 1:N | 한 사용자는 여러 면접 질문 기록을 소유할 수 있습니다. |
@@ -151,6 +151,8 @@ questionId + currentUser
 ```
 
 조회, 수정, 삭제 시 현재 로그인 사용자의 데이터인지 확인하고, 다른 사용자의 데이터에는 접근할 수 없도록 처리합니다.
+
+지원 건 삭제 시 `INTERVIEW_QUESTIONS` → `INTERVIEWS` → `APPLICATIONS`, 면접 삭제 시 `INTERVIEW_QUESTIONS` → `INTERVIEWS` 순으로 서비스 계층에서 명시적으로 삭제합니다.
 
 ### 4.4 열거형은 문자열로 저장
 
