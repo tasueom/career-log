@@ -8,6 +8,8 @@ import com.careerlog.application.entity.Application;
 import com.careerlog.application.entity.ApplicationStatus;
 import com.careerlog.application.exception.ApplicationNotFoundException;
 import com.careerlog.application.repository.ApplicationRepository;
+import com.careerlog.interview.repository.InterviewRepository;
+import com.careerlog.question.repository.InterviewQuestionRepository;
 import com.careerlog.user.entity.User;
 import com.careerlog.user.exception.UserNotFoundException;
 import com.careerlog.user.repository.UserRepository;
@@ -24,6 +26,8 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final InterviewRepository interviewRepository;
+    private final InterviewQuestionRepository interviewQuestionRepository;
 
     @Transactional
     public ApplicationResponse create(Long userId, ApplicationCreateRequest request) {
@@ -118,9 +122,13 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void delete(Long userId, Long applicationId){
+    public void delete(Long userId, Long applicationId) {
         Application application = applicationRepository.findByIdAndUserId(applicationId, userId)
                 .orElseThrow(ApplicationNotFoundException::new);
+
+        interviewQuestionRepository.deleteAllByApplicationIdAndUserId(applicationId, userId);
+
+        interviewRepository.deleteAllByApplicationIdAndUserId(applicationId, userId);
 
         applicationRepository.delete(application);
     }
